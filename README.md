@@ -5,6 +5,7 @@ Muito se tem falado de containers e consequentemente do Docker no ambiente de de
 
 ## Criação do arquivo docker-compose.yml
 
+```yaml
 services:
   nginx:
     image: nginx
@@ -44,4 +45,3 @@ services:
 
 volumes:
   db_data:
-
