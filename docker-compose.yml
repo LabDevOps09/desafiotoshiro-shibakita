@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   nginx:
     image: nginx
@@ -12,7 +10,7 @@ services:
       - app
 
   app:
-    build: ./app
+    image: php:7.4-apache
     container_name: php_app
     depends_on:
       - db
@@ -22,7 +20,8 @@ services:
       - DB_PASSWORD=Senha123
       - DB_NAME=meubanco
     volumes:
-      - ./app:/var/www/html
+      - ./php:/var/www/html
+    command: ["apache2-foreground"]
 
   db:
     image: mysql:5.7
@@ -39,52 +38,6 @@ services:
 volumes:
   db_data:
 
-# Dockerfile para o PHP
----
-FROM php:7.4-apache
-RUN docker-php-ext-install mysqli
-COPY ./app /var/www/html/
-EXPOSE 80
-CMD ["apache2-foreground"]
 
-# Ajuste no código PHP
----
-<html>
-<head>
-<title>Exemplo PHP</title>
-</head>
-<body>
 
-<?php
-ini_set("display_errors", 1);
-header('Content-Type: text/html; charset=iso-8859-1');
 
-echo 'Versao Atual do PHP: ' . phpversion() . '<br>';
-
-$servername = getenv('DB_HOST');
-$username = getenv('DB_USER');
-$password = getenv('DB_PASSWORD');
-$database = getenv('DB_NAME');
-
-// Criar conexão
-$link = new mysqli($servername, $username, $password, $database);
-
-if (mysqli_connect_errno()) {
-    printf("Connect failed: %s\n", mysqli_connect_error());
-    exit();
-}
-
-$valor_rand1 = rand(1, 999);
-$valor_rand2 = strtoupper(substr(bin2hex(random_bytes(4)), 1));
-$host_name = gethostname();
-
-$query = "INSERT INTO dados (AlunoID, Nome, Sobrenome, Endereco, Cidade, Host) VALUES ('$valor_rand1' , '$valor_rand2', '$valor_rand2', '$valor_rand2', '$valor_rand2','$host_name')";
-
-if ($link->query($query) === TRUE) {
-  echo "New record created successfully";
-} else {
-  echo "Error: " . $link->error;
-}
-?>
-</body>
-</html>
